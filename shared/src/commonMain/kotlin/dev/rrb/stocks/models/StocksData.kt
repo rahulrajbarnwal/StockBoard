@@ -22,35 +22,36 @@ data class DashboardCategory(
     val apiType: String,
     val stocks: List<StockData> = emptyList()
 )
-
 @Serializable
 data class ApiResponse(
-    val data_url: String,
-    val tabs: List<TabData>,
-    val filter: FilterData
+    val data_url: String? = "",
+    val defaultPostData: DefaultPostData? = null,  // ✅ NEW
+    val tabs: List<TabData> = emptyList(),
+    val filter: FilterData? = null
+)
+
+@Serializable
+data class DefaultPostData(
+    val pagesize: String = "6",
+    val pageNumber: String = "1",
+    val duration: String = "1D",
+    val viewId: String = "15070",
+    val filterValue: List<String> = listOf("2371"),
+    val filterType: String = "index"
 )
 
 @Serializable
 data class TabData(
-    val nm: String,
-    val va: String,
-    val postData: PostData
-)
-
-@Serializable
-data class PostData(
-    val apiType: String,
-    val pagesize: String,
-    val pageNumber: String,
-    val duration: String,
-    val viewId: String
+    val nm: String = "",
+    val va: String = "",
+    val apiType: String = ""  // ✅ SIMPLIFIED
 )
 
 @Serializable
 data class FilterData(
-    val filterUrl: String,
-    val fu_upd: String,
-    val dinId: String,
-    val dinName: String,
-    val dParamKey: String
+    val filterUrl: String? = "",
+    val fu_upd: String? = "",
+    val dinId: String? = "",
+    val dinName: String? = "",
+    val dParamKey: String? = ""
 )

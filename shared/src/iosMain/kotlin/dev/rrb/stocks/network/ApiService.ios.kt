@@ -2,40 +2,37 @@ package dev.rrb.stocks.network
 
 import dev.rrb.stocks.models.ApiResponse
 import dev.rrb.stocks.models.StockData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 actual object ApiService {
 
-    private var configData: ApiResponse? = null
+    private val _apiResponseFlow = MutableStateFlow<dev.rrb.stocks.network.ApiResponse>(
+        dev.rrb.stocks.network.ApiResponse.Loading
+    )
+
+    actual fun getApiResponseFlow(): StateFlow<dev.rrb.stocks.network.ApiResponse> {
+        return _apiResponseFlow
+    }
 
     actual suspend fun loadConfigData(): ApiResponse? {
-        configData = ConfigLoader.loadConfig()
-        return configData
+        return null
     }
 
     actual fun getConfigData(): ApiResponse? {
-        return configData
+        return null
     }
 
     actual fun generateSampleStocks(apiType: String): List<StockData> {
-        return when (apiType) {
-            Constants.API_TYPE_GAINERS -> listOf(
-                StockData(
-                    id = "1",
-                    companyName = "Mankind Pharma",
-                    symbol = "MANKIND",
-                    currentPrice = 2438.00,
-                    priceChange = 137.00,
-                    changePercent = 5.96,
-                    volume = "1.3M",
-                    exchange = "NSE"
-                )
-            )
-            else -> emptyList()
-        }
+        return emptyList()
     }
 
-    actual suspend fun fetchStocksFromApi(apiType: String): List<StockData> {
-        // iOS fallback - use sample data
-        return generateSampleStocks(apiType)
+    actual suspend fun fetchStocksFromApi(
+        apiType: String,
+        filterType: String,
+        filterId: String
+    ): List<StockData> {
+        _apiResponseFlow.value = dev.rrb.stocks.network.ApiResponse.Loading
+        return emptyList()
     }
 }

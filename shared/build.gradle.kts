@@ -58,7 +58,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
-
+            //implementation(libs.androidx.compose.material.icons)
 
             implementation(libs.bundles.coroutines.common)
             implementation(libs.androidx.lifecycle.viewmodel)

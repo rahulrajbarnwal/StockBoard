@@ -1,8 +1,7 @@
 package dev.rrb.stocks.network
 
 import android.util.Log
-import com.google.gson.Gson
-import dev.rrb.stocks.models.PostData
+import dev.rrb.stocks.models.DefaultPostData
 import dev.rrb.stocks.models.StockApiRequest
 import dev.rrb.stocks.models.StockApiResponse
 import okhttp3.OkHttpClient
@@ -41,40 +40,34 @@ object RetrofitClient {
 
 actual interface StockApiInterface {
     actual suspend fun getStocks(
-        postData: PostData
+        apiType: String,
+        postData: DefaultPostData
     ): StockApiResponse
 }
 
 actual object StockApiImpl : StockApiInterface {
     actual override suspend fun getStocks(
-        postData: PostData
+        apiType: String,
+        postData: DefaultPostData
     ): StockApiResponse {
-        Log.d("StockApiImpl", "Creating request - apiType: ${postData.apiType}")
         return try {
+            Log.d("StockApiImpl", "Creating request - apiType: $apiType")
             val request = StockApiRequest(
-                apiType = postData.apiType,
+                apiType = apiType,
                 pagesize = postData.pagesize,
                 pageNumber = postData.pageNumber,
                 duration = postData.duration,
-                viewId = postData.viewId
+                viewId = postData.viewId,
+                filterValue = postData.filterValue,
+                filterType = postData.filterType
             )
-            Log.d("StockApiImpl", "Request body: $request")
 
+            Log.d("StockApiImpl", "Request: $request")
             val response = RetrofitClient.api.getStocks(request)
-
-            Log.d("StockApiImpl", "=== FULL RESPONSE ===")
-            Log.d("StockApiImpl", "Response object: $response")
-            Log.d("StockApiImpl", "Response.data: ${response.dataList}")
-            Log.d("StockApiImpl", "Response.data?.stocks: ${response.pageSummary?.pagesize}")
-
-            val gson = Gson()
-            val json = gson.toJson(response)
-            Log.d("StockApiImpl", "Full JSON: $json")
-
+            Log.d("StockApiImpl", "Response: ${response.dataList?.size ?: 0} items")
             response
         } catch (e: Exception) {
             Log.e("StockApiImpl", "API Error: ${e.message}", e)
-
             e.printStackTrace()
             StockApiResponse(null)
         }

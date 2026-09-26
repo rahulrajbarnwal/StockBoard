@@ -8,5 +8,7 @@ data class StockApiRequest(
     val pagesize: String,
     val pageNumber: String,
     val duration: String,
-    val viewId: String
+    val viewId: String,
+    val filterValue: List<String>,
+    val filterType: String
 )
