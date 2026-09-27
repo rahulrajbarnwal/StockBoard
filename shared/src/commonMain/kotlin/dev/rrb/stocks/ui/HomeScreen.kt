@@ -25,7 +25,7 @@ import dev.rrb.stocks.viewmodel.HomeViewModel
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel(),
+    viewModel: HomeViewModel = viewModel { HomeViewModel() },
     onFilterClick: () -> Unit = {}
 ) {
     val categories = viewModel.categories.collectAsState().value

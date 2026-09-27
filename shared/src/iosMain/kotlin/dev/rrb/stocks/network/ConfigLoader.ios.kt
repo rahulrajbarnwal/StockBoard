@@ -4,7 +4,8 @@ import dev.rrb.stocks.models.ApiResponse
 
 actual object ConfigLoader {
     actual suspend fun loadConfig(): ApiResponse? {
-        TODO("Not yet implemented")
+        // iOS fallback - no bundled config yet
+        return null
     }
 }
 

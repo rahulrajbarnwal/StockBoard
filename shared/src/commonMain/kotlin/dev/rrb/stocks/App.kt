@@ -27,7 +27,7 @@ fun App() {
     MaterialTheme {
         val currentScreen = remember { mutableStateOf(Screen.HOME) }
         val showFilterScreen = remember { mutableStateOf(false) }
-        val homeViewModel = viewModel<HomeViewModel>()
+        val homeViewModel = viewModel { HomeViewModel() }
 
         Column(
             modifier = Modifier
