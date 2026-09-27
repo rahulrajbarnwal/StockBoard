@@ -64,6 +64,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.bundles.ktor.common)
+            implementation(libs.navigationevent.compose)
+            implementation(libs.datastore.preferences.core)
 
         }
         iosMain.dependencies {

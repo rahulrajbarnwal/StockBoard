@@ -13,8 +13,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import dev.rrb.stocks.models.FilterOption
 import dev.rrb.stocks.viewmodel.HomeViewModel
+import org.jetbrains.compose.resources.painterResource
+import stocks.shared.generated.resources.Res
+import stocks.shared.generated.resources.ic_arrow_back
 
 @Composable
 fun FilterScreen(
@@ -33,6 +39,12 @@ fun FilterScreen(
         }
     }
 
+    // System back (Android back button/gesture, iOS edge swipe) returns to Home instead of closing the app
+    NavigationBackHandler(
+        state = rememberNavigationEventState(NavigationEventInfo.None),
+        onBackCompleted = onBackClick
+    )
+
     val categories = filterOptions.keys.toList()
 
     val categoryItems = if (selectedCategory != null) {
@@ -47,56 +59,49 @@ fun FilterScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            // Keeps the lists above the iOS home indicator / Android gesture bar
+            .navigationBarsPadding()
     ) {
-        // ✅ Toolbar below status bar
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFFAFAFA))
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    "←",
-                    fontSize = 24.sp,
-                    modifier = Modifier.clickable { onBackClick() }
-                )
-                Text(
-                    "Filter",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .background(
-                        color = Color(0xFFE0E0E0),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
+        // TopAppBar applies status bar insets itself, so the header never sits under the notch
+        TopAppBar(
+            title = { Text("Filter", fontWeight = FontWeight.Bold) },
+            navigationIcon = {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_arrow_back),
+                        contentDescription = "Back"
                     )
-                    .padding(4.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                ExchangeButton(
-                    text = "NSE",
-                    isSelected = selectedExchange == "NSE",
-                    onClick = { selectedExchange = "NSE" }
-                )
-                ExchangeButton(
-                    text = "BSE",
-                    isSelected = selectedExchange == "BSE",
-                    onClick = { selectedExchange = "BSE" }
-                )
-            }
-        }
-
-        Divider(color = Color(0xFFE0E0E0), thickness = 1.dp)
+                }
+            },
+            actions = {
+                Row(
+                    modifier = Modifier
+                        .padding(end = 12.dp)
+                        .background(
+                            color = Color(0xFFE0E0E0),
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
+                        )
+                        .padding(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    ExchangeButton(
+                        text = "NSE",
+                        isSelected = selectedExchange == "NSE",
+                        onClick = { selectedExchange = "NSE" }
+                    )
+                    ExchangeButton(
+                        text = "BSE",
+                        isSelected = selectedExchange == "BSE",
+                        onClick = { selectedExchange = "BSE" }
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color(0xFF1F41BB),
+                titleContentColor = Color.White,
+                navigationIconContentColor = Color.White
+            )
+        )
 
         Row(
             modifier = Modifier

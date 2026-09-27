@@ -11,6 +11,8 @@ import dev.rrb.stocks.network.ApiResponse
 import dev.rrb.stocks.network.ApiService
 import dev.rrb.stocks.network.ConfigLoader
 import dev.rrb.stocks.network.FilterApiImpl
+import dev.rrb.stocks.storage.FilterPreferences
+import dev.rrb.stocks.storage.SavedFilter
 import dev.rrb.stocks.utils.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -69,7 +71,25 @@ class HomeViewModel : ViewModel() {
             }
         }
         loadFilterOptions()
-        loadDashboardData()
+        // Restore the last selected filter before the first load so it isn't fetched with the default
+        viewModelScope.launch {
+            restoreSavedFilter()
+            loadDashboardData()
+        }
+    }
+
+    private suspend fun restoreSavedFilter() {
+        val saved = FilterPreferences.getSavedFilter()
+        if (saved == null) {
+            Logger.debug("HomeViewModel", "No saved filter, using default")
+            return
+        }
+
+        Logger.debug("HomeViewModel", "Restoring saved filter: $saved")
+        isFilterSelectedByUser = true
+        _filterName.value = saved.name
+        _filterType.value = saved.type
+        _filterId.value = saved.id
     }
 
 
@@ -132,7 +152,7 @@ class HomeViewModel : ViewModel() {
                 if (configData != null) {
                     ApiService.loadConfigData()
 
-                    // Only apply the config default until the user picks a filter
+                    // Only apply the config default when there's no user-picked or saved filter
                     if (!isFilterSelectedByUser) {
                         _filterName.value = configData.filter?.dinName?.takeIf { it.isNotBlank() } ?: "NIFTY 500"
                     }
@@ -199,6 +219,14 @@ class HomeViewModel : ViewModel() {
         Logger.debug("HomeViewModel", "Updated _filterName to: ${_filterName.value}")
         Logger.debug("HomeViewModel", "Updated _filterType to: ${_filterType.value}")
         Logger.debug("HomeViewModel", "Updated _filterId to: ${_filterId.value}")
+
+        if (_filterId.value.isNotBlank()) {
+            viewModelScope.launch {
+                FilterPreferences.saveFilter(
+                    SavedFilter(name = _filterName.value, id = _filterId.value, type = _filterType.value)
+                )
+            }
+        }
 
         loadDashboardData()
     }

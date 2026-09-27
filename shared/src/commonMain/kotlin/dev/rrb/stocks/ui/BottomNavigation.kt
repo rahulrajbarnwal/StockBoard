@@ -1,22 +1,38 @@
 package dev.rrb.stocks.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.rrb.stocks.navigation.Screen
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
+import stocks.shared.generated.resources.Res
+import stocks.shared.generated.resources.ic_home_filled
+import stocks.shared.generated.resources.ic_home_outlined
+import stocks.shared.generated.resources.ic_person_filled
+import stocks.shared.generated.resources.ic_person_outlined
+import stocks.shared.generated.resources.ic_star_filled
+import stocks.shared.generated.resources.ic_star_outlined
+import stocks.shared.generated.resources.ic_work_filled
+import stocks.shared.generated.resources.ic_work_outlined
 
 data class BottomNavItem(
     val screen: Screen,
     val label: String,
-    val icon: String  // ✅ Unicode emoji instead
+    val selectedIcon: DrawableResource,
+    val unselectedIcon: DrawableResource
+)
+
+private val bottomNavItems = listOf(
+    BottomNavItem(Screen.HOME, "Home", Res.drawable.ic_home_filled, Res.drawable.ic_home_outlined),
+    BottomNavItem(Screen.WATCHLIST, "Watchlist", Res.drawable.ic_star_filled, Res.drawable.ic_star_outlined),
+    BottomNavItem(Screen.PORTFOLIO, "Portfolio", Res.drawable.ic_work_filled, Res.drawable.ic_work_outlined),
+    BottomNavItem(Screen.PROFILE, "Profile", Res.drawable.ic_person_filled, Res.drawable.ic_person_outlined)
 )
 
 @Composable
@@ -24,25 +40,18 @@ fun BottomNavigationBar(
     currentScreen: Screen,
     onScreenSelected: (Screen) -> Unit
 ) {
-    val items = listOf(
-        BottomNavItem(Screen.HOME, "Home", "🏠"),
-        BottomNavItem(Screen.WATCHLIST, "Watchlist", "⭐"),
-        BottomNavItem(Screen.PORTFOLIO, "Portfolio", "💼"),
-        BottomNavItem(Screen.PROFILE, "Profile", "👤")
-    )
-
     NavigationBar(
-        modifier = Modifier
-            .background(Color.White),
         containerColor = Color.White,
         contentColor = Color(0xFF1F41BB)
     ) {
-        items.forEach { item ->
+        bottomNavItems.forEach { item ->
+            val selected = currentScreen == item.screen
             NavigationBarItem(
                 icon = {
-                    Text(
-                        text = item.icon,
-                        fontSize = 24.sp
+                    // Icon tints from LocalContentColor, so the colors below apply to it
+                    Icon(
+                        painter = painterResource(if (selected) item.selectedIcon else item.unselectedIcon),
+                        contentDescription = item.label
                     )
                 },
                 label = {
@@ -51,7 +60,7 @@ fun BottomNavigationBar(
                         fontSize = 11.sp
                     )
                 },
-                selected = currentScreen == item.screen,
+                selected = selected,
                 onClick = { onScreenSelected(item.screen) },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color(0xFF1F41BB),

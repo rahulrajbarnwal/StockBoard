@@ -1,20 +1,22 @@
 package dev.rrb.stocks
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.rrb.stocks.navigation.Screen
 import dev.rrb.stocks.ui.BottomNavigationBar
@@ -29,14 +31,24 @@ fun App() {
         val showFilterScreen = remember { mutableStateOf(false) }
         val homeViewModel = viewModel { HomeViewModel() }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFFAFAFA))
-        ) {
+        Scaffold(
+            containerColor = Color(0xFFFAFAFA),
+            // Each screen's TopAppBar handles the status bar itself; the NavigationBar handles the bottom
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            bottomBar = {
+                // BottomNavigation only shows when NOT in FilterScreen
+                if (!showFilterScreen.value) {
+                    BottomNavigationBar(
+                        currentScreen = currentScreen.value,
+                        onScreenSelected = { currentScreen.value = it }
+                    )
+                }
+            }
+        ) { innerPadding ->
+            val screenModifier = Modifier.padding(innerPadding)
+
             when (currentScreen.value) {
                 Screen.HOME -> {
-                    // ✅ Toggle between HomeScreen and FilterScreen
                     if (showFilterScreen.value) {
                         FilterScreen(
                             viewModel = homeViewModel,
@@ -44,72 +56,33 @@ fun App() {
                         )
                     } else {
                         HomeScreen(
-                            modifier = Modifier.weight(1f),
+                            modifier = screenModifier,
                             viewModel = homeViewModel,
                             onFilterClick = { showFilterScreen.value = true }
                         )
                     }
                 }
 
-                Screen.WATCHLIST -> {
-                    Text("Watchlist Screen")
-                }
-
-                Screen.PORTFOLIO -> {
-                    Text("Portfolio Screen")
-                }
-
-                Screen.PROFILE -> {
-                    Text("Profile Screen")
-                }
-            }
-
-            // BottomNavigation only shows when NOT in FilterScreen
-            if (!showFilterScreen.value) {
-                BottomNavigationBar(
-                    currentScreen = currentScreen.value,
-                    onScreenSelected = { currentScreen.value = it }
-                )
+                Screen.WATCHLIST -> PlaceholderScreen("Watchlist", screenModifier)
+                Screen.PORTFOLIO -> PlaceholderScreen("Portfolio", screenModifier)
+                Screen.PROFILE -> PlaceholderScreen("Profile", screenModifier)
             }
         }
     }
 }
 
 @Composable
-fun WatchlistScreen(modifier: Modifier = Modifier) {
-    EmptyScreen(modifier)
-}
-
-@Composable
-fun PortfolioScreen(modifier: Modifier = Modifier) {
-    EmptyScreen(modifier)
-}
-
-@Composable
-fun ProfileScreen(modifier: Modifier = Modifier) {
-    EmptyScreen(modifier)
-}
-
-@Composable
-fun EmptyScreen(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xFFFAFAFA))
-    ) {
+fun PlaceholderScreen(title: String, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxSize()) {
         TopAppBar(
-            title = {
-                Text(
-                    "Stock Market",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
+            title = { Text(title, fontWeight = FontWeight.Bold) },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFF1F41BB)
+                containerColor = Color(0xFF1F41BB),
+                titleContentColor = Color.White
             )
         )
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("$title coming soon", color = Color(0xFF999999))
+        }
     }
 }
