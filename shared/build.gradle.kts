@@ -44,9 +44,9 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.uiTooling)
-            implementation(libs.bundles.retrofit)
-            implementation(libs.gson)
             implementation(libs.bundles.coroutines.android)
+            implementation(libs.ktor.client.okhttp)
+
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -63,9 +63,11 @@ kotlin {
             implementation(libs.bundles.coroutines.common)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.bundles.ktor.common)
 
-
-
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
